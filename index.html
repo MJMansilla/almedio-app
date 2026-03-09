@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Al Medio Pedidos">
+<meta name="theme-color" content="#FFF4DC">
+<title>Al Medio – Pedidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF8EC;--surface:#FFFDF5;--card:#FFFFFF;
+  --border:#EDD898;--border2:#F5C842;
+  --orange:#D95F00;--orange2:#F5A800;--orange-light:#FFF0D8;
+  --green:#1E7D2B;--green2:#2DA83C;--green-light:#E8F5EA;
+  --text:#2D1800;--muted:#9A7030;--muted2:#C49840;
+  --red:#CC2222;--red-light:#FFF0F0;
+  --blue:#1A6FA8;--blue-light:#E8F0F8;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;padding-top:var(--safe-top)}
+
+/* HEADER */
+header{position:fixed;top:var(--safe-top);left:0;right:0;z-index:1000;background:rgba(255,248,236,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 14px rgba(217,95,0,.1)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--orange2);box-shadow:0 2px 8px rgba(217,95,0,.2)}
+.logo-text{display:flex;flex-direction:column;line-height:1.1}
+.logo-title{font-size:17px;font-weight:900;color:var(--green)}
+.logo-sub{font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.8px;text-transform:uppercase}
+.date-chip{background:var(--orange);color:#fff;border-radius:20px;padding:6px 12px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;box-shadow:0 2px 8px rgba(217,95,0,.3)}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,248,236,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:2px solid var(--border);padding:8px 12px calc(var(--safe-bottom) + 8px);display:flex;gap:8px;box-shadow:0 -2px 16px rgba(217,95,0,.1);z-index:1000}
+.nav-btn{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:9px 4px;color:var(--muted);font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s}
+.nav-btn.active{background:var(--orange-light);border-color:var(--orange);color:var(--orange)}
+.nav-btn .nicon{font-size:20px}
+
+/* CONTENT */
+.content{padding-top:calc(var(--safe-top) + 68px);padding-bottom:calc(var(--safe-bottom) + 88px);min-height:100vh}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* SECTION HEADER */
+.sec-head{padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-size:18px;font-weight:900;color:var(--text)}
+.sec-sub{font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
+
+/* CARDS & FORMS */
+.panel{padding:14px 16px}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(217,95,0,.06)}
+.card-title{font-size:13px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:10px;font-weight:900;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:600;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A7030' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);background:#fff}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted2);font-weight:500}
+.field textarea{resize:none;height:60px;line-height:1.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* BUTTONS */
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--orange),var(--orange2));border:none;border-radius:14px;padding:15px;color:#fff;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(217,95,0,.3);transition:all .2s}
+.btn-primary:active{transform:scale(.97);opacity:.9}
+.btn-secondary{width:100%;background:transparent;border:1.5px solid var(--orange);border-radius:14px;padding:13px;color:var(--orange);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-secondary:active{background:var(--orange-light)}
+.btn-danger{background:transparent;border:1.5px solid var(--red);border-radius:10px;padding:6px 10px;color:var(--red);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-danger:active{background:var(--red-light)}
+.btn-sm{background:var(--orange-light);border:1.5px solid var(--border2);border-radius:10px;padding:7px 14px;color:var(--orange);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-sm:active{opacity:.8}
+.btn-green{background:var(--green-light);border:1.5px solid #A8DDB0;border-radius:10px;padding:6px 12px;color:var(--green);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-green:active{opacity:.8}
+.btn-blue{background:var(--blue-light);border:1.5px solid #90BEE8;border-radius:10px;padding:6px 12px;color:var(--blue);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-blue:active{opacity:.8}
+.btn-edit{background:#FFF8E0;border:1.5px solid var(--border2);border-radius:10px;padding:6px 12px;color:#8B6200;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-edit:active{opacity:.8}
+
+/* PAY SELECTOR */
+.pay-sel{display:flex;gap:8px}
+.pay-opt{flex:1;padding:11px 4px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.pay-opt .pico{font-size:20px}
+.pay-opt.sel-ef{border-color:var(--orange2);background:#FFF8E0;color:#8B6200}
+.pay-opt.sel-tr{border-color:var(--blue);background:var(--blue-light);color:var(--blue)}
+.pay-opt:active{transform:scale(.96)}
+
+/* MENU ITEMS IN LIST */
+.menu-item{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;animation:fadeUp .3s ease}
+.menu-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(to bottom,var(--orange),var(--orange2))}
+.menu-icon{width:44px;height:44px;min-width:44px;background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(217,95,0,.25)}
+.menu-info{flex:1;min-width:0}
+.menu-name{font-size:16px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-price{font-family:'DM Mono',monospace;font-size:13px;color:var(--green);font-weight:500;margin-top:2px}
+.stock-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;margin-top:4px}
+.stock-ok{background:var(--green-light);color:var(--green);border:1px solid #A8DDB0}
+.stock-low{background:#FFF8E0;color:#8B6200;border:1px solid var(--border2)}
+.stock-out{background:var(--red-light);color:var(--red);border:1px solid #F0A0A0}
+.menu-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.stock-ctrl{display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:4px 8px}
+.stock-ctrl button{background:none;border:none;font-size:18px;color:var(--orange);cursor:pointer;padding:0 2px;line-height:1;font-weight:900}
+.stock-ctrl span{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;min-width:24px;text-align:center}
+
+/* MULTI-MENU ITEMS IN FORM */
+.menu-line{display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;animation:fadeUp .2s ease}
+.menu-line select{flex:1;background:transparent;border:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--text);outline:none;-webkit-appearance:none;appearance:none}
+.menu-line .qty-ctrl{display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:3px 6px;min-width:80px;justify-content:center}
+.menu-line .qty-ctrl button{background:none;border:none;font-size:16px;color:var(--orange);cursor:pointer;font-weight:900;line-height:1}
+.menu-line .qty-ctrl span{font-family:'DM Mono',monospace;font-size:14px;min-width:20px;text-align:center}
+.menu-line .ml-price{font-family:'DM Mono',monospace;font-size:12px;color:var(--green);min-width:54px;text-align:right;font-weight:500}
+.menu-line .ml-del{background:none;border:none;font-size:18px;color:var(--red);cursor:pointer;padding:0 2px}
+.total-preview{background:linear-gradient(135deg,var(--green-light),#D0F0D8);border:1.5px solid #A8DDB0;border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.total-preview .tp-label{font-size:13px;font-weight:800;color:var(--green)}
+.total-preview .tp-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--green)}
+.btn-add-line{width:100%;background:var(--orange-light);border:1.5px dashed var(--border2);border-radius:12px;padding:11px;color:var(--orange);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.btn-add-line:active{opacity:.8}
+
+/* ORDER CARDS */
+.order-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden;animation:fadeUp .3s ease;box-shadow:0 2px 10px rgba(217,95,0,.05)}
+.order-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(to bottom,var(--orange),var(--orange2))}
+.order-card.paid-ef::before{background:linear-gradient(to bottom,#D4A800,#F5C842)}
+.order-card.paid-tr::before{background:linear-gradient(to bottom,var(--blue),#5BAEE8)}
+.order-card.delivered-order{opacity:.55}
+.order-card.delivered-order::before{background:linear-gradient(to bottom,var(--green),var(--green2))}
+.order-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.order-name{font-size:17px;font-weight:900}
+.order-items{font-size:13px;font-weight:700;color:var(--orange);margin-top:2px;line-height:1.5}
+.order-addr{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:3px}
+.order-price{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--green);white-space:nowrap}
+.order-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:6px}
+.pay-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800}
+.pay-chip.ef{background:#FFF8E0;color:#8B6200;border:1px solid var(--border2)}
+.pay-chip.tr{background:var(--blue-light);color:var(--blue);border:1px solid #90BEE8}
+.order-time{font-size:11px;color:var(--muted);font-weight:600}
+.order-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+
+/* GAINS */
+.gains-today{background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:20px;padding:20px;margin-bottom:16px;color:#fff;box-shadow:0 6px 20px rgba(217,95,0,.35)}
+.gains-today .gt-label{font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;opacity:.85}
+.gains-today .gt-total{font-family:'DM Mono',monospace;font-size:38px;font-weight:500;line-height:1;margin:6px 0}
+.gains-today .gt-row{display:flex;gap:12px;margin-top:12px}
+.gains-today .gt-box{flex:1;background:rgba(255,255,255,.18);border-radius:12px;padding:10px 12px}
+.gains-today .gt-box .gb-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:500}
+.gains-today .gt-box .gb-lbl{font-size:10px;font-weight:800;letter-spacing:1px;opacity:.8;text-transform:uppercase;margin-top:2px}
+.week-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(217,95,0,.06)}
+.week-title{font-size:13px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px}
+.week-bars{display:flex;gap:6px;align-items:flex-end;height:80px;margin-bottom:8px}
+.day-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.day-bar-bg{flex:1;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;position:relative;overflow:hidden;min-height:10px}
+.day-bar-fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,var(--orange),var(--orange2));border-radius:6px;transition:height .6s ease}
+.day-bar-fill.today-bar{background:linear-gradient(to top,var(--green),var(--green2))}
+.day-label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.week-total-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;border-top:1px solid var(--border);margin-top:4px}
+.week-total-label{font-size:12px;font-weight:800;color:var(--muted)}
+.week-total-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--green)}
+.orders-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.summary-box{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(217,95,0,.05)}
+.summary-box .sb-val{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;color:var(--orange)}
+.summary-box .sb-lbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+/* RUTAS BANNER */
+.rutas-banner{background:linear-gradient(135deg,var(--green),var(--green2));border-radius:16px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 14px rgba(30,125,43,.25)}
+.rutas-banner .rb-text{color:#fff}
+.rutas-banner .rb-title{font-size:14px;font-weight:900}
+.rutas-banner .rb-sub{font-size:11px;font-weight:600;opacity:.85;margin-top:2px}
+.btn-rutas{background:#fff;border:none;border-radius:12px;padding:10px 16px;color:var(--green);font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:all .2s}
+.btn-rutas:active{opacity:.8;transform:scale(.97)}
+
+/* EMPTY / TOAST / MODAL */
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:14px}
+.empty-text{font-size:16px;font-weight:900;color:var(--text);margin-bottom:6px}
+.empty-sub{font-size:13px;font-weight:600;line-height:1.5}
+.toast{position:fixed;bottom:calc(var(--safe-bottom) + 100px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:2px solid var(--border);border-radius:30px;padding:12px 22px;font-size:14px;font-weight:800;z-index:9999;opacity:0;transition:all .3s;white-space:nowrap;box-shadow:0 8px 32px rgba(217,95,0,.2);color:var(--text)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.modal-overlay{position:fixed;inset:0;background:rgba(45,24,0,.5);z-index:2000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(var(--safe-bottom) + 20px);width:100%;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s ease;border-top:2px solid var(--border)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 16px}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:16px;color:var(--text)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <img src="data:image/png;base64,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" alt="Al Medio">
+    <div class="logo-text">
+      <span class="logo-title">Al Medio</span>
+      <span class="logo-sub">Gestión de Pedidos</span>
+    </div>
+  </div>
+  <div class="date-chip" id="dateChip">...</div>
+</header>
+
+<div class="content">
+
+  <!-- ══ MENÚS ══ -->
+  <div id="tab-menus" class="tab-panel active">
+    <div class="sec-head">
+      <div><div class="sec-title">🍽 Menús del Día</div><div class="sec-sub">Stock disponible de hoy</div></div>
+      <button class="btn-sm" onclick="openModal('modal-addmenu')">+ Nuevo</button>
+    </div>
+    <div class="panel">
+      <div id="menuList">
+        <div class="empty" id="menuEmpty">
+          <div class="empty-icon">🍲</div>
+          <div class="empty-text">Sin menús cargados</div>
+          <div class="empty-sub">Tocá "+ Nuevo" para agregar<br>las opciones del día</div>
+        </div>
+      </div>
+      <button class="btn-secondary" onclick="clearMenus()">🗑 Limpiar menús del día</button>
+    </div>
+  </div>
+
+  <!-- ══ PEDIDOS ══ -->
+  <div id="tab-orders" class="tab-panel">
+    <div class="sec-head">
+      <div><div class="sec-title">📋 Pedidos de Hoy</div><div class="sec-sub" id="orderCountSub">0 pedidos</div></div>
+      <button class="btn-sm" onclick="openOrderModal()">+ Pedido</button>
+    </div>
+    <div class="panel">
+      <div class="rutas-banner">
+        <div class="rb-text">
+          <div class="rb-title">🚚 Enviar a App de Rutas</div>
+          <div class="rb-sub">Exportá las direcciones de entrega</div>
+        </div>
+        <button class="btn-rutas" onclick="exportToRoutes()">Exportar →</button>
+      </div>
+      <div class="orders-summary">
+        <div class="summary-box"><div class="sb-val" id="sum-total">0</div><div class="sb-lbl">Total pedidos</div></div>
+        <div class="summary-box"><div class="sb-val" id="sum-pending" style="color:var(--orange)">0</div><div class="sb-lbl">Sin entregar</div></div>
+      </div>
+      <div id="orderList">
+        <div class="empty" id="orderEmpty">
+          <div class="empty-icon">📭</div>
+          <div class="empty-text">Sin pedidos aún</div>
+          <div class="empty-sub">Tocá "+ Pedido" para registrar uno</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GANANCIAS ══ -->
+  <div id="tab-gains" class="tab-panel">
+    <div class="sec-head"><div><div class="sec-title">💰 Ganancias</div><div class="sec-sub">Resumen financiero</div></div></div>
+    <div class="panel">
+      <div class="gains-today">
+        <div class="gt-label">💵 Total del día</div>
+        <div class="gt-total" id="gt-total">$0</div>
+        <div class="gt-row">
+          <div class="gt-box"><div class="gb-val" id="gt-ef">$0</div><div class="gb-lbl">💵 Efectivo</div></div>
+          <div class="gt-box"><div class="gb-val" id="gt-tr">$0</div><div class="gb-lbl">📲 Transfer.</div></div>
+          <div class="gt-box"><div class="gb-val" id="gt-count">0</div><div class="gb-lbl">📦 Pedidos</div></div>
+        </div>
+      </div>
+      <div class="week-card">
+        <div class="week-title">📅 Semana (Lun → Vie)</div>
+        <div class="week-bars" id="weekBars"></div>
+        <div id="weekDayAmounts" style="display:flex;gap:6px"></div>
+        <div class="week-total-row">
+          <span class="week-total-label">Total semanal</span>
+          <span class="week-total-val" id="week-total">$0</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pedidos cobrados hoy</div>
+        <div id="gains-order-list"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-weight:600">Sin pedidos</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-menus" onclick="switchTab('menus')"><span class="nicon">🍽</span>Menús</button>
+  <button class="nav-btn" id="nav-orders" onclick="switchTab('orders')"><span class="nicon">📋</span>Pedidos</button>
+  <button class="nav-btn" id="nav-gains" onclick="switchTab('gains')"><span class="nicon">💰</span>Ganancias</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- ═══ MODAL MENÚ ═══ -->
+<div class="modal-overlay" id="modal-addmenu" onclick="closeModalOutside(event,'modal-addmenu')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🍽 Nuevo Menú del Día</div>
+    <div class="field"><label>Nombre del menú</label><input type="text" id="m-name" placeholder="Ej: Milanesa con puré..."></div>
+    <div class="row2">
+      <div class="field"><label>Precio ($)</label><input type="number" id="m-price" placeholder="0" inputmode="numeric"></div>
+      <div class="field"><label>Stock</label><input type="number" id="m-stock" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div class="field"><label>Descripción (opcional)</label><textarea id="m-desc" placeholder="Incluye postre, sin TACC..."></textarea></div>
+    <button class="btn-primary" onclick="addMenu()">✓ Agregar menú</button>
+    <button class="btn-secondary" onclick="closeModal('modal-addmenu')">Cancelar</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL PEDIDO (crear / editar) ═══ -->
+<div class="modal-overlay" id="modal-order" onclick="closeModalOutside(event,'modal-order')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="order-modal-title">📦 Nuevo Pedido</div>
+    <div class="field"><label>Nombre del cliente</label><input type="text" id="o-client" placeholder="Ej: María García"></div>
+    <div class="field"><label>Dirección de entrega</label><input type="text" id="o-addr" placeholder="Ej: Av. Colón 1234, Córdoba"></div>
+
+    <div class="field">
+      <label>Menús del pedido</label>
+      <div id="menuLines"></div>
+      <button class="btn-add-line" onclick="addMenuLine()">+ Agregar ítem</button>
+      <div class="total-preview">
+        <span class="tp-label">💰 Total calculado</span>
+        <span class="tp-val" id="order-total-preview">$0</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Medio de pago</label>
+      <div class="pay-sel">
+        <div class="pay-opt" id="op-ef" onclick="selOrderPay('ef')"><span class="pico">💵</span>Efectivo</div>
+        <div class="pay-opt" id="op-tr" onclick="selOrderPay('tr')"><span class="pico">📲</span>Transferencia</div>
+      </div>
+    </div>
+    <div class="field"><label>Nota (opcional)</label><input type="text" id="o-note" placeholder="Sin cebolla, extra salsa..."></div>
+    <button class="btn-primary" id="order-submit-btn" onclick="submitOrder()">✓ Generar pedido</button>
+    <button class="btn-secondary" onclick="closeModal('modal-order')">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+const TODAY = todayKey();
+let menus  = JSON.parse(localStorage.getItem('am_menus_'  + TODAY) || '[]');
+let orders = JSON.parse(localStorage.getItem('am_orders_' + TODAY) || '[]');
+let orderPaySel = null;
+let editingOrderId = null;   // null = nuevo, number = editando
+let menuLines = [];          // [{menuId, qty}] en el modal activo
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtPrice(n){ return '$'+Number(n).toLocaleString('es-AR'); }
+function fmtTime(ts){ const d=new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+
+// ════════════════════════════════════════════════════
+// DATE CHIP
+// ════════════════════════════════════════════════════
+(function(){
+  const d=new Date();
+  const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  document.getElementById('dateChip').textContent=days[d.getDay()]+' '+d.getDate()+' '+months[d.getMonth()];
+})();
+
+// ════════════════════════════════════════════════════
+// TABS / MODAL
+// ════════════════════════════════════════════════════
+function switchTab(tab){
+  ['menus','orders','gains'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('nav-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='gains') renderGains();
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function closeModalOutside(e,id){ if(e.target.id===id) closeModal(id); }
+
+// ════════════════════════════════════════════════════
+// MENUS
+// ════════════════════════════════════════════════════
+function addMenu(){
+  const name=document.getElementById('m-name').value.trim();
+  const price=parseFloat(document.getElementById('m-price').value)||0;
+  const stock=parseInt(document.getElementById('m-stock').value)||0;
+  const desc=document.getElementById('m-desc').value.trim();
+  if(!name){showToast('Ingresá el nombre','err');return;}
+  if(stock<1){showToast('Stock debe ser mayor a 0','err');return;}
+  menus.push({id:Date.now(),name,price,stock,desc});
+  saveMenus();
+  ['m-name','m-price','m-stock','m-desc'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  closeModal('modal-addmenu');
+  renderMenus();
+  showToast('✓ Menú agregado','ok');
+}
+function changeStock(id,delta){
+  const m=menus.find(x=>x.id===id); if(!m) return;
+  m.stock=Math.max(0,m.stock+delta);
+  saveMenus(); renderMenus();
+}
+function deleteMenu(id){
+  menus=menus.filter(x=>x.id!==id); saveMenus(); renderMenus();
+  showToast('Menú eliminado','');
+}
+function clearMenus(){
+  if(!menus.length) return;
+  if(!confirm('¿Limpiar todos los menús del día?')) return;
+  menus=[]; saveMenus(); renderMenus(); showToast('Menús limpiados','');
+}
+function renderMenus(){
+  const list=document.getElementById('menuList');
+  list.querySelectorAll('.menu-item').forEach(e=>e.remove());
+  document.getElementById('menuEmpty').style.display=menus.length?'none':'';
+  menus.forEach(m=>{
+    const sc=m.stock===0?'stock-out':m.stock<=3?'stock-low':'stock-ok';
+    const st=m.stock===0?'❌ Agotado':m.stock<=3?`⚠️ Últimos ${m.stock}`:`✅ ${m.stock} disp.`;
+    const el=document.createElement('div'); el.className='menu-item';
+    el.innerHTML=`
+      <div class="menu-icon">🍽</div>
+      <div class="menu-info">
+        <div class="menu-name">${m.name}</div>
+        ${m.price?`<div class="menu-price">${fmtPrice(m.price)}</div>`:''}
+        ${m.desc?`<div style="font-size:12px;color:var(--muted);margin-top:2px;font-weight:600">${m.desc}</div>`:''}
+        <span class="stock-badge ${sc}">${st}</span>
+      </div>
+      <div class="menu-actions">
+        <div class="stock-ctrl">
+          <button onclick="changeStock(${m.id},-1)">−</button>
+          <span>${m.stock}</span>
+          <button onclick="changeStock(${m.id},1)">+</button>
+        </div>
+        <button class="btn-danger" onclick="deleteMenu(${m.id})">✕ Eliminar</button>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+// ════════════════════════════════════════════════════
+// MULTI-MENU LINES IN FORM
+// ════════════════════════════════════════════════════
+function buildMenuOptions(selectedId){
+  let opts='<option value="">— Elegir menú —</option>';
+  menus.forEach(m=>{
+    const dis=m.stock<=0?'disabled':'';
+    const sel=m.id===selectedId?'selected':'';
+    opts+=`<option value="${m.id}" ${dis} ${sel}>${m.name} ${m.price?'('+fmtPrice(m.price)+')':''} – ${m.stock} disp.</option>`;
+  });
+  return opts;
+}
+
+function addMenuLine(menuId=null, qty=1){
+  const lineId='ml-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  menuLines.push({lineId, menuId, qty});
+  renderMenuLines();
+}
+
+function removeMenuLine(lineId){
+  menuLines=menuLines.filter(l=>l.lineId!==lineId);
+  renderMenuLines();
+}
+
+function setMenuLineMenu(lineId, menuId){
+  const l=menuLines.find(x=>x.lineId===lineId);
+  if(l){ l.menuId=menuId?parseInt(menuId):null; updateTotalPreview(); }
+}
+
+function setMenuLineQty(lineId, delta){
+  const l=menuLines.find(x=>x.lineId===lineId);
+  if(!l) return;
+  l.qty=Math.max(1, l.qty+delta);
+  document.getElementById('qty-val-'+lineId).textContent=l.qty;
+  updateLinePrice(lineId);
+  updateTotalPreview();
+}
+
+function updateLinePrice(lineId){
+  const l=menuLines.find(x=>x.lineId===lineId);
+  if(!l) return;
+  const m=menus.find(x=>x.id===l.menuId);
+  const el=document.getElementById('ml-price-'+lineId);
+  if(el) el.textContent=m&&m.price ? fmtPrice(m.price*l.qty) : '';
+}
+
+function updateTotalPreview(){
+  let total=0;
+  menuLines.forEach(l=>{
+    const m=menus.find(x=>x.id===l.menuId);
+    if(m&&m.price) total+=m.price*l.qty;
+  });
+  document.getElementById('order-total-preview').textContent=fmtPrice(total);
+}
+
+function renderMenuLines(){
+  const container=document.getElementById('menuLines');
+  container.innerHTML='';
+  menuLines.forEach(l=>{
+    const m=l.menuId?menus.find(x=>x.id===l.menuId):null;
+    const linePrice=m&&m.price?fmtPrice(m.price*l.qty):'';
+    const div=document.createElement('div');
+    div.className='menu-line'; div.id='line-'+l.lineId;
+    div.innerHTML=`
+      <select onchange="setMenuLineMenu('${l.lineId}',this.value)">${buildMenuOptions(l.menuId)}</select>
+      <div class="qty-ctrl">
+        <button onclick="setMenuLineQty('${l.lineId}',-1)">−</button>
+        <span id="qty-val-${l.lineId}">${l.qty}</span>
+        <button onclick="setMenuLineQty('${l.lineId}',1)">+</button>
+      </div>
+      <span class="ml-price" id="ml-price-${l.lineId}">${linePrice}</span>
+      <button class="ml-del" onclick="removeMenuLine('${l.lineId}')">✕</button>`;
+    container.appendChild(div);
+  });
+  updateTotalPreview();
+}
+
+// ════════════════════════════════════════════════════
+// ORDER MODAL OPEN
+// ════════════════════════════════════════════════════
+function openOrderModal(orderId=null){
+  editingOrderId=orderId;
+  menuLines=[];
+  orderPaySel=null;
+  ['op-ef','op-tr'].forEach(id=>document.getElementById(id).className='pay-opt');
+
+  if(orderId){
+    // EDITAR
+    const o=orders.find(x=>x.id===orderId);
+    if(!o) return;
+    document.getElementById('order-modal-title').textContent='✏️ Editar Pedido';
+    document.getElementById('order-submit-btn').textContent='✓ Guardar cambios';
+    document.getElementById('o-client').value=o.client;
+    document.getElementById('o-addr').value=o.addr;
+    document.getElementById('o-note').value=o.note||'';
+    // Restaurar items
+    (o.items||[{menuId:o.menuId,menuName:o.menuName,qty:o.qty||1,unitPrice:0}]).forEach(it=>{
+      menuLines.push({lineId:'ml-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), menuId:it.menuId, qty:it.qty});
+    });
+    orderPaySel=o.payment;
+    document.getElementById('op-'+o.payment).className='pay-opt sel-'+o.payment;
+  } else {
+    // NUEVO
+    document.getElementById('order-modal-title').textContent='📦 Nuevo Pedido';
+    document.getElementById('order-submit-btn').textContent='✓ Generar pedido';
+    document.getElementById('o-client').value='';
+    document.getElementById('o-addr').value='';
+    document.getElementById('o-note').value='';
+    menuLines=[];
+    addMenuLine(); // empezar con 1 línea
+  }
+  renderMenuLines();
+  openModal('modal-order');
+}
+
+function selOrderPay(type){
+  orderPaySel=orderPaySel===type?null:type;
+  ['ef','tr'].forEach(t=>document.getElementById('op-'+t).className='pay-opt'+(orderPaySel===t?' sel-'+t:''));
+}
+
+// ════════════════════════════════════════════════════
+// SUBMIT ORDER (crear o editar)
+// ════════════════════════════════════════════════════
+function submitOrder(){
+  const client=document.getElementById('o-client').value.trim();
+  const addr=document.getElementById('o-addr').value.trim();
+  const note=document.getElementById('o-note').value.trim();
+
+  if(!client){showToast('Ingresá el nombre del cliente','err');return;}
+  if(!addr){showToast('Ingresá la dirección','err');return;}
+  if(!menuLines.length||!menuLines.some(l=>l.menuId)){showToast('Agregá al menos un menú','err');return;}
+  if(!orderPaySel){showToast('Seleccioná medio de pago','err');return;}
+
+  // Validar stock y calcular total
+  let total=0;
+  const validLines=menuLines.filter(l=>l.menuId);
+  for(const l of validLines){
+    const m=menus.find(x=>x.id===l.menuId);
+    if(!m){showToast('Un menú no existe','err');return;}
+    // Si estamos editando, primero devolvemos el stock anterior
+    let stockAvail=m.stock;
+    if(editingOrderId){
+      const prev=orders.find(x=>x.id===editingOrderId);
+      if(prev){
+        const prevItem=(prev.items||[{menuId:prev.menuId,qty:prev.qty||1}]).find(it=>it.menuId===l.menuId);
+        if(prevItem) stockAvail+=prevItem.qty;
+      }
+    }
+    if(stockAvail<l.qty){showToast(`Stock insuficiente: ${m.name} (quedan ${stockAvail})`,'err');return;}
+    total+=m.price*l.qty;
+  }
+
+  // Si editando: restaurar stock del pedido anterior completo
+  if(editingOrderId){
+    const prev=orders.find(x=>x.id===editingOrderId);
+    if(prev){
+      (prev.items||[{menuId:prev.menuId,qty:prev.qty||1}]).forEach(it=>{
+        const m=menus.find(x=>x.id===it.menuId);
+        if(m) m.stock+=it.qty;
+      });
+    }
+  }
+
+  // Descontar stock nuevo
+  validLines.forEach(l=>{
+    const m=menus.find(x=>x.id===l.menuId);
+    if(m) m.stock-=l.qty;
+  });
+  saveMenus(); renderMenus();
+
+  const items=validLines.map(l=>{
+    const m=menus.find(x=>x.id===l.menuId);
+    return {menuId:l.menuId,menuName:m.name,qty:l.qty,unitPrice:m.price};
+  });
+  const menuName=items.map(it=>`${it.menuName}${it.qty>1?' x'+it.qty:''}`).join(', ');
+
+  if(editingOrderId){
+    const idx=orders.findIndex(x=>x.id===editingOrderId);
+    if(idx>=0){
+      orders[idx]={...orders[idx],client,addr,note,payment:orderPaySel,items,menuName,price:total,editedAt:Date.now()};
+    }
+    showToast('✓ Pedido actualizado','ok');
+  } else {
+    orders.push({id:Date.now(),client,addr,note,payment:orderPaySel,items,menuName,price:total,date:TODAY,ts:Date.now(),delivered:false});
+    showToast('✓ Pedido generado','ok');
+  }
+  saveOrders();
+  closeModal('modal-order');
+  renderOrders();
+}
+
+// ════════════════════════════════════════════════════
+// ORDER ACTIONS
+// ════════════════════════════════════════════════════
+function toggleOrderDelivered(id){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  o.delivered=!o.delivered;
+  saveOrders(); renderOrders();
+  showToast(o.delivered?'✓ Entregado':'Desmarcado',o.delivered?'ok':'');
+}
+
+function deleteOrder(id){
+  const o=orders.find(x=>x.id===id);
+  if(o){
+    (o.items||[{menuId:o.menuId,qty:o.qty||1}]).forEach(it=>{
+      const m=menus.find(x=>x.id===it.menuId);
+      if(m) m.stock+=it.qty;
+    });
+    saveMenus(); renderMenus();
+  }
+  orders=orders.filter(x=>x.id!==id);
+  saveOrders(); renderOrders();
+  showToast('Pedido eliminado','');
+}
+
+function renderOrders(){
+  const list=document.getElementById('orderList');
+  list.querySelectorAll('.order-card').forEach(e=>e.remove());
+  document.getElementById('orderEmpty').style.display=orders.length?'none':'';
+  document.getElementById('sum-total').textContent=orders.length;
+  document.getElementById('sum-pending').textContent=orders.filter(o=>!o.delivered).length;
+  document.getElementById('orderCountSub').textContent=orders.length+' pedido'+(orders.length!==1?'s':'');
+
+  [...orders].reverse().forEach(o=>{
+    const itemsHtml=(o.items||[{menuName:o.menuName,qty:o.qty||1}])
+      .map(it=>`🍽 ${it.menuName}${it.qty>1?' x'+it.qty:''}${it.unitPrice?' – '+fmtPrice(it.unitPrice*it.qty):''}`)
+      .join('<br>');
+    const el=document.createElement('div');
+    el.className='order-card'+(o.payment==='ef'?' paid-ef':' paid-tr')+(o.delivered?' delivered-order':'');
+    el.innerHTML=`
+      <div class="order-header">
+        <div style="flex:1;min-width:0">
+          <div class="order-name">${o.client}</div>
+          <div class="order-items">${itemsHtml}</div>
+          <div class="order-addr">📍 ${o.addr}</div>
+          ${o.note?`<div style="font-size:11px;color:var(--muted);margin-top:2px;font-weight:600">📝 ${o.note}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="order-price">${fmtPrice(o.price)}</div>
+          <div class="order-time">${fmtTime(o.ts)}</div>
+        </div>
+      </div>
+      <div class="order-meta">
+        <span class="pay-chip ${o.payment}">${o.payment==='ef'?'💵 Efectivo':'📲 Transferencia'}</span>
+        ${o.delivered?'<span style="font-size:11px;font-weight:800;color:var(--green)">✅ Entregado</span>':''}
+        ${o.editedAt?'<span style="font-size:10px;color:var(--muted);font-weight:600">✏️ Editado</span>':''}
+      </div>
+      <div class="order-actions">
+        <button class="btn-edit" onclick="openOrderModal(${o.id})">✏️ Editar</button>
+        <button class="btn-green" onclick="toggleOrderDelivered(${o.id})">${o.delivered?'↩ Desmarcar':'✓ Entregado'}</button>
+        <button class="btn-danger" onclick="deleteOrder(${o.id})">✕</button>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+// ════════════════════════════════════════════════════
+// EXPORTAR A APP DE RUTAS
+// ════════════════════════════════════════════════════
+function exportToRoutes(){
+  const pending=orders.filter(o=>!o.delivered);
+  if(!pending.length){showToast('No hay pedidos pendientes','err');return;}
+
+  // Leer stops existentes de la app de rutas
+  let existing=[];
+  try{ existing=JSON.parse(localStorage.getItem('almedio_stops')||'[]'); } catch{}
+
+  // Agregar solo los que no están ya (por cliente+addr)
+  let added=0;
+  pending.forEach(o=>{
+    const alreadyIn=existing.some(s=>s.name===o.client&&s.address===o.addr);
+    if(!alreadyIn){
+      const itemsSummary=(o.items||[{menuName:o.menuName,qty:o.qty||1}])
+        .map(it=>it.menuName+(it.qty>1?' x'+it.qty:'')).join(', ');
+      existing.push({
+        id: Date.now()+Math.random(),
+        name: o.client,
+        address: o.addr,
+        detail: itemsSummary,
+        note: o.note||'',
+        payment: o.payment==='ef'?'efectivo':'transferencia',
+        lat: null, lng: null,
+        delivered: false
+      });
+      added++;
+    }
+  });
+
+  localStorage.setItem('almedio_stops', JSON.stringify(existing));
+  showToast(added>0?`✓ ${added} paradas enviadas a Rutas`:'Ya estaban en la app de Rutas','ok');
+}
+
+// ════════════════════════════════════════════════════
+// GANANCIAS
+// ════════════════════════════════════════════════════
+function renderGains(){
+  const ef=orders.filter(o=>o.payment==='ef').reduce((s,o)=>s+o.price,0);
+  const tr=orders.filter(o=>o.payment==='tr').reduce((s,o)=>s+o.price,0);
+  document.getElementById('gt-total').textContent=fmtPrice(ef+tr);
+  document.getElementById('gt-ef').textContent=fmtPrice(ef);
+  document.getElementById('gt-tr').textContent=fmtPrice(tr);
+  document.getElementById('gt-count').textContent=orders.length;
+  renderWeekChart(); renderGainsList();
+}
+
+function getWeekDays(){
+  const d=new Date(),day=d.getDay(),mon=new Date(d);
+  mon.setDate(d.getDate()-(day===0?6:day-1));
+  return Array.from({length:5},(_,i)=>{
+    const dd=new Date(mon); dd.setDate(mon.getDate()+i);
+    const key=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    return{key,label:['Lun','Mar','Mié','Jue','Vie'][i],isToday:key===TODAY};
+  });
+}
+function getDayTotal(key){
+  return JSON.parse(localStorage.getItem('am_orders_'+key)||'[]').reduce((s,o)=>s+(o.price||0),0);
+}
+function renderWeekChart(){
+  const days=getWeekDays(), totals=days.map(d=>getDayTotal(d.key));
+  const mx=Math.max(...totals,1);
+  document.getElementById('week-total').textContent=fmtPrice(totals.reduce((a,b)=>a+b,0));
+  document.getElementById('weekBars').innerHTML=days.map((d,i)=>`
+    <div class="day-bar-wrap">
+      <div class="day-bar-bg"><div class="day-bar-fill${d.isToday?' today-bar':''}" style="height:${Math.round(totals[i]/mx*100)}%"></div></div>
+      <div class="day-label" style="${d.isToday?'color:var(--green);':''}">${d.label}</div>
+    </div>`).join('');
+  document.getElementById('weekDayAmounts').innerHTML=days.map((_,i)=>`
+    <div style="flex:1;text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:4px">${totals[i]?fmtPrice(totals[i]).replace('$',''):'—'}</div>`).join('');
+}
+function renderGainsList(){
+  const el=document.getElementById('gains-order-list');
+  if(!orders.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-weight:600">Sin pedidos</div>';return;}
+  el.innerHTML=[...orders].reverse().map(o=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:14px;font-weight:800">${o.client}</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:1px">${o.menuName} · ${fmtTime(o.ts)}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'DM Mono',monospace;font-size:15px;color:var(--green)">${fmtPrice(o.price)}</div>
+        <span class="pay-chip ${o.payment}" style="margin-top:3px;display:inline-flex">${o.payment==='ef'?'💵 Efectivo':'📲 Transfer.'}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+// STORAGE / TOAST / INIT
+// ════════════════════════════════════════════════════
+function saveMenus(){ localStorage.setItem('am_menus_'+TODAY, JSON.stringify(menus)); }
+function saveOrders(){ localStorage.setItem('am_orders_'+TODAY, JSON.stringify(orders)); }
+let toastT;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+renderMenus(); renderOrders();
+</script>
+</body>
+</html>
